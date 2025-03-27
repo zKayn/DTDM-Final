@@ -54,20 +54,42 @@ app.post("/products/add", async (req, res) => {
 });
 
 // API: Cập nhật sản phẩm
-app.put("/update-product/:id", (req, res) => {
+app.put("/update-product/:id", async (req, res) => {
   const { id } = req.params;
   const { name, price } = req.body;
 
-  const sql = "UPDATE products SET name = ?, price = ? WHERE id = ?";
-  db.query(sql, [name, price, id], (err, result) => {
-    if (err) return res.status(500).json({ error: err.message });
+  if (!name || !price) {
+    return res.status(400).json({ message: "Thiếu tên hoặc giá" });
+  }
+
+  try {
+    const [result] = await pool.execute("UPDATE products SET name = ?, price = ? WHERE id = ?", [name, price, id]);
 
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: "Không tìm thấy sản phẩm" });
     }
 
     res.json({ message: "Sản phẩm đã được cập nhật" });
-  });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ✅ API: Xóa sản phẩm
+app.delete("/delete-product/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const [result] = await pool.execute("DELETE FROM products WHERE id = ?", [id]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Không tìm thấy sản phẩm" });
+    }
+
+    res.json({ message: "Sản phẩm đã bị xóa" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 
