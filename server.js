@@ -1,47 +1,48 @@
-require("dotenv").config();
 const express = require("express");
 const mysql = require("mysql2");
+const cors = require("cors");
 
 const app = express();
-app.use(express.json());
+app.use(cors());
+app.use(express.json()); // Để server đọc JSON từ body
 
-// Kết nối MySQL
 const db = mysql.createConnection({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASS,
-  database: process.env.DB_NAME
+  host: "your-mysql-host",
+  user: "your-mysql-user",
+  password: "your-mysql-password",
+  database: "your-database"
 });
 
-db.connect(err => {
+db.connect((err) => {
   if (err) {
-    console.error("Error connecting to MySQL:", err);
-    return;
+    console.error("Database connection failed: " + err.message);
+  } else {
+    console.log("Connected to MySQL");
   }
-  console.log("Connected to MySQL");
 });
 
-// Thêm sản phẩm
-app.post("/add-product", (req, res) => {
+// ✅ Route thêm sản phẩm
+app.post("/products/add", (req, res) => {
   const { name, price } = req.body;
+  if (!name || !price) {
+    return res.status(400).json({ message: "Missing name or price" });
+  }
+
   const sql = "INSERT INTO products (name, price) VALUES (?, ?)";
   db.query(sql, [name, price], (err, result) => {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json({ message: "Product added", id: result.insertId });
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+    res.status(201).json({ message: "Product added successfully!", id: result.insertId });
   });
 });
 
-// Tìm kiếm sản phẩm
-app.get("/search", (req, res) => {
-  const { name } = req.query;
-  const sql = "SELECT * FROM products WHERE name LIKE ?";
-  db.query(sql, [`%${name}%`], (err, results) => {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json(results);
-  });
+// ✅ Route kiểm tra server có chạy không
+app.get("/", (req, res) => {
+  res.send("Server is running...");
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
