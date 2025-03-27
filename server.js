@@ -28,7 +28,7 @@ const pool = mysql.createPool({
   }
 })();
 
-// Route lấy danh sách sản phẩm
+// Lấy danh sách sản phẩm
 app.get("/products", async (req, res) => {
   try {
     const [rows] = await pool.execute("SELECT * FROM products");
@@ -38,7 +38,25 @@ app.get("/products", async (req, res) => {
   }
 });
 
-// Route thêm sản phẩm
+// Lấy thông tin chi tiết của một sản phẩm theo ID
+app.get("/products/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const [rows] = await pool.execute("SELECT * FROM products WHERE id = ?", [id]);
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: "Không tìm thấy sản phẩm" });
+    }
+
+    res.json(rows[0]); // Trả về sản phẩm đầu tiên tìm thấy
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
+// Thêm sản phẩm
 app.post("/products/add", async (req, res) => {
   const { name, price } = req.body;
   if (!name || !price) {
@@ -53,7 +71,7 @@ app.post("/products/add", async (req, res) => {
   }
 });
 
-// API: Cập nhật sản phẩm
+// Cập nhật sản phẩm
 app.put("/products/:id", async (req, res) => {
   const { id } = req.params;
   const { name, price } = req.body;
@@ -75,7 +93,7 @@ app.put("/products/:id", async (req, res) => {
   }
 });
 
-// ✅ API: Xóa sản phẩm
+// Xóa sản phẩm
 app.delete("/products/:id", async (req, res) => {
   const { id } = req.params;
 
