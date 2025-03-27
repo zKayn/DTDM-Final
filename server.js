@@ -6,7 +6,7 @@ const app = express();
 app.use(cors());
 app.use(express.json()); // Để server đọc JSON từ body
 
-// ✅ Tạo pool kết nối đến MySQL
+// Tạo pool kết nối đến MySQL
 const pool = mysql.createPool({
   host: "bnazlrnsly8w9uqixvlr-mysql.services.clever-cloud.com",
   user: "us47gunrvc0yzsry",
@@ -17,7 +17,7 @@ const pool = mysql.createPool({
   queueLimit: 0
 });
 
-// ✅ Kiểm tra kết nối MySQL
+// Kiểm tra kết nối MySQL
 (async () => {
   try {
     const connection = await pool.getConnection();
@@ -52,6 +52,24 @@ app.post("/products/add", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+// API: Cập nhật sản phẩm
+app.put("/update-product/:id", (req, res) => {
+  const { id } = req.params;
+  const { name, price } = req.body;
+
+  const sql = "UPDATE products SET name = ?, price = ? WHERE id = ?";
+  db.query(sql, [name, price, id], (err, result) => {
+    if (err) return res.status(500).json({ error: err.message });
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Không tìm thấy sản phẩm" });
+    }
+
+    res.json({ message: "Sản phẩm đã được cập nhật" });
+  });
+});
+
 
 // Route kiểm tra server có chạy không
 app.get("/", (req, res) => {
