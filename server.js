@@ -54,7 +54,7 @@ app.post("/products/add", async (req, res) => {
 });
 
 // API: Cập nhật sản phẩm
-app.put("/update-products/:id", async (req, res) => {
+app.put("/products/:id", async (req, res) => {
   const { id } = req.params;
   const { name, price } = req.body;
 
@@ -76,7 +76,7 @@ app.put("/update-products/:id", async (req, res) => {
 });
 
 // ✅ API: Xóa sản phẩm
-app.delete("/delete-products/:id", async (req, res) => {
+app.delete("/products/:id", async (req, res) => {
   const { id } = req.params;
 
   try {
