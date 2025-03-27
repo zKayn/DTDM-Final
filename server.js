@@ -21,14 +21,14 @@ const pool = mysql.createPool({
 (async () => {
   try {
     const connection = await pool.getConnection();
-    console.log("Connected to MySQL");
+    console.log("Đã kết nối với MySQL");
     connection.release();
   } catch (err) {
-    console.error("Database connection failed:", err.message);
+    console.error("Kết nối cơ sở dữ liệu không thành công:", err.message);
   }
 })();
 
-// ✅ Route lấy danh sách sản phẩm
+// Route lấy danh sách sản phẩm
 app.get("/products", async (req, res) => {
   try {
     const [rows] = await pool.execute("SELECT * FROM products");
@@ -38,27 +38,27 @@ app.get("/products", async (req, res) => {
   }
 });
 
-// ✅ Route thêm sản phẩm
+// Route thêm sản phẩm
 app.post("/products/add", async (req, res) => {
   const { name, price } = req.body;
   if (!name || !price) {
-    return res.status(400).json({ message: "Missing name or price" });
+    return res.status(400).json({ message: "Thiếu tên hoặc giá" });
   }
 
   try {
     const [result] = await pool.execute("INSERT INTO products (name, price) VALUES (?, ?)", [name, price]);
-    res.status(201).json({ message: "Product added successfully!", id: result.insertId });
+    res.status(201).json({ message: "Sản phẩm được thêm thành công!", id: result.insertId });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// ✅ Route kiểm tra server có chạy không
+// Route kiểm tra server có chạy không
 app.get("/", (req, res) => {
-  res.send("Server is running...");
+  res.send("Máy chủ đang chạy...");
 });
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`Máy chủ chạy trên cổng ${PORT}`);
 });
