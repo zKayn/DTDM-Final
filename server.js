@@ -7,10 +7,10 @@ app.use(cors());
 app.use(express.json()); // Để server đọc JSON từ body
 
 const db = mysql.createConnection({
-  host: "your-mysql-host",
-  user: "your-mysql-user",
-  password: "your-mysql-password",
-  database: "your-database"
+  host: "bnazlrnsly8w9uqixvlr-mysql.services.clever-cloud.com",
+  user: "us47gunrvc0yzsry",
+  password: "MPZPSJBlUoFvjDrOzuT6",
+  database: "bnazlrnsly8w9uqixvlr"
 });
 
 db.connect((err) => {
