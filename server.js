@@ -46,3 +46,11 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+app.get("/products", async (req, res) => {
+  try {
+      const [rows] = await db.execute("SELECT * FROM products");
+      res.json(rows);
+  } catch (err) {
+      res.status(500).json({ error: err.message });
+  }
+});
